@@ -1,3 +1,6 @@
 numpy
 pynrrd
 Pillow
+imageio
+imageio-ffmpeg
+pytest
