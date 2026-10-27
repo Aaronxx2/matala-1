@@ -2,13 +2,22 @@ import argparse
 import csv
 import os
 import sys
+import time
 from pathlib import Path
 
 import imageio.v2 as imageio
 import nrrd
 import numpy as np
 
-from slicing import extract_slice
+from slicing import check_shape, extract_slice, image_size
+
+
+def load_volume(nrrd_path):
+    # Keep the NRRD axis order so points are used as voxel indices (x, y, z).
+    volume, header = nrrd.read(str(nrrd_path), index_order="F")
+    if volume.ndim != 3:
+        raise ValueError(f"{nrrd_path}: expected a 3D volume, got {volume.ndim} dimensions.")
+    return volume
 
 
 def read_planes(csv_path):
@@ -37,40 +46,33 @@ def read_planes(csv_path):
     return planes
 
 
-def cut(volume, row_number, points):
-    # Cuts one plane, the triangle is a trapezoid where a1 = a2 = a.
+def four_points(points):
+    # The triangle (a, b, c) is the trapezoid (a, a, b, c).
     if len(points) == 3:
-        a1, a2, b, c = points[0], points[0], points[1], points[2]
-    else:
-        a1, a2, b, c = points
-    try:
-        return extract_slice(volume, a1, a2, b, c)
-    except ValueError as error:
-        raise ValueError(f"CSV row {row_number}: {error}")
+        return [points[0], points[0], points[1], points[2]]
+    return points
 
 
-def image_size(points):
-    # Size of the image E without computing it (same formulas as in slicing.py).
-    a1 = np.array(points[0], dtype=float)
-    b = np.array(points[-2], dtype=float)
-    c = np.array(points[-1], dtype=float)
-    height = int(np.ceil(np.linalg.norm(b - a1)))
-    width = int(np.floor(np.linalg.norm(c - b))) + 1
-    return height, width
-
-
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description="Cut a 3D volume along each plane of a CSV file and save the cuts as a video.")
     parser.add_argument("nrrd_file", type=Path)
     parser.add_argument("csv_file", type=Path)
     parser.add_argument("mp4_file", type=Path)
     parser.add_argument("--fps", type=int, default=10, help="frames per second of the video (default 10)")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
-    # Keep the NRRD axis order so points are used as voxel indices (x, y, z).
-    volume, header = nrrd.read(str(args.nrrd_file), index_order="F")
+    volume = load_volume(args.nrrd_file)
     print(f"Volume shape: {volume.shape}")
     planes = read_planes(args.csv_file)
+
+    # Check every plane before writing anything, and get the size of each image.
+    sizes = []
+    for row_number, points in planes:
+        try:
+            a1, a2, b, c, dab, dbc = check_shape(*four_points(points))
+        except ValueError as error:
+            raise ValueError(f"CSV row {row_number}: {error}")
+        sizes.append(image_size(dab, dbc))
 
     # Same gray scale for every frame: 0 is black and the max of the volume is white.
     # So the same value always has the same brightness in the whole video.
@@ -82,31 +84,34 @@ def main():
     # All frames of a video must have the same size: take the biggest image,
     # the smaller ones are put in the middle on a black background.
     # Multiple of 16 because video encoders work with blocks of 16 pixels.
-    sizes = [image_size(points) for row_number, points in planes]
     frame_height = int(np.ceil(max(h for h, w in sizes) / 16)) * 16
     frame_width = int(np.ceil(max(w for h, w in sizes) / 16)) * 16
 
-    # Write in a temporary file first, so a bad row never leaves a half video.
+    # Write in a temporary file first, so an error never leaves a half video.
     temp_file = args.mp4_file.with_name(args.mp4_file.stem + ".tmp.mp4")
+    cut_time = 0  # time spent computing the cuts only, without the video
     try:
         with imageio.get_writer(temp_file, fps=args.fps) as video:
             for row_number, points in planes:
-                image = cut(volume, row_number, points)
-                pixels = np.clip((image - low) / (high - low) * 255, 0, 255).astype(np.uint8)
+                start = time.perf_counter()
+                image = extract_slice(volume, *four_points(points))
+                cut_time += time.perf_counter() - start
 
+                pixels = np.clip((image - low) / (high - low) * 255, 0, 255).astype(np.uint8)
                 frame = np.zeros((frame_height, frame_width), dtype=np.uint8)
                 top = (frame_height - pixels.shape[0]) // 2
                 left = (frame_width - pixels.shape[1]) // 2
                 frame[top:top + pixels.shape[0], left:left + pixels.shape[1]] = pixels
                 video.append_data(frame)
-                print(f"CSV row {row_number}: frame with image shape {image.shape}")
         os.replace(temp_file, args.mp4_file)
-    except Exception:
+    except BaseException:
         if temp_file.exists():
             temp_file.unlink()
         raise
 
     print(f"Saved video: {args.mp4_file.resolve()} ({len(planes)} frames)")
+    speed = len(planes) / cut_time if cut_time > 0 else float("inf")
+    print(f"Cuts computed in {cut_time:.2f} s: {speed:.1f} cuts per second (video writing not counted)")
 
 
 if __name__ == "__main__":
