@@ -8,7 +8,12 @@ python Ex0.py MRHead_1.nrrd random_100.csv demo/random_100.mp4
 python benchmark.py
 ```
 
-Computer: Intel Xeon 2.8 GHz, 2 cores, Linux, Python 3.13, NumPy 2.5 (a cloud machine, not my PC). The numbers changed by about 10% from one run to the next; the tables give the range of 2 or 3 runs.
+Computers:
+
+- **My PC**: Windows, Python 3.11.9.
+- **A cloud machine**: Intel Xeon 2.8 GHz, 2 cores, Linux, Python 3.13, NumPy 2.5.
+
+The numbers change by about 10% from one run to the next; for the cloud machine the tables give the range of 2 or 3 runs.
 
 ## The videos
 
@@ -35,16 +40,16 @@ Only the cuts are measured, not the reading of the files or the writing of the v
 
 `benchmark.py`, 200 cuts per test:
 
-| Planes | Image size | Cuts per second |
-|---|---|---|
-| Squares through the whole volume, turning (worst case) | about 500 × 710 pixels | 61 to 66 |
-| Random triangles and trapezoids | 135 000 pixels on average | 220 to 233 |
+| Planes | Image size | My PC | Cloud machine |
+|---|---|---|---|
+| Squares through the whole volume, turning (worst case) | about 500 × 710 pixels | 45.7 | 61 to 66 |
+| Random triangles and trapezoids | 135 000 pixels on average | 191.3 | 220 to 233 |
 
-The requirement is at least 30 cuts per second (100 if possible). The worst case is 2 times over the minimum, the random planes are over 100.
+The requirement is at least 30 cuts per second (100 if possible). On my PC the worst case is 1.5 times the minimum, and the random planes are over 100.
 
 ### On MRHead
 
-Printed by `Ex0.py`:
+Printed by `Ex0.py` (cloud machine):
 
 | CSV | Cuts per second |
 |---|---|
