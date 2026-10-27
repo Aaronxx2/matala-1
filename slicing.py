@@ -1,5 +1,8 @@
 import numpy as np
 
+# Smallest length treated as non-zero (also the tolerance used in the assignment).
+EPS = 0.001
+
 
 def extract_triangle_slice(volume, a, b, c):
     # Returns the 2D image extracted from the volume.
@@ -11,8 +14,21 @@ def extract_triangle_slice(volume, a, b, c):
 
     dab = np.linalg.norm(b - a)  # Distance from a to b.
     dbc = np.linalg.norm(c - b)  # Distance from b to c.
+    dac = np.linalg.norm(c - a)  # Distance from a to c.
 
-    # We can add a check for dab == 0 before dividing.
+    # Degenerate triangle: coincident points give an image of height 0
+    # (dab) or a zero-length base (dbc) and would cause a division by zero.
+    if dab < EPS:
+        raise ValueError("Degenerate triangle: points a and b coincide (dist(a,b) = 0).")
+    if dbc < EPS:
+        raise ValueError("Degenerate triangle: points b and c coincide (dist(b,c) = 0).")
+    # The algorithm requires an isosceles triangle: dist(a,b) = dist(a,c).
+    # v_ac is divided by dab, so a2 only reaches c when both sides are equal.
+    if abs(dab - dac) >= EPS:
+        raise ValueError(
+            f"Not an isosceles triangle: dist(a,b) = {dab:.4f} but dist(a,c) = {dac:.4f} "
+            f"(difference must be < {EPS})."
+        )
     v_ab = (b - a) / dab
     v_ac = (c - a) / dab
 
@@ -39,8 +55,9 @@ def extract_triangle_slice(volume, a, b, c):
         for x1 in range(int(np.floor(d12)) + 1):
             value = 0
             # Use the nearest voxel; volume axes are assumed to be (x, y, z).
-            if np.all(p >= 0) and np.all(p <= np.array(volume.shape) - 1):
-                voxel_index = np.rint(p).astype(int)
+            if np.all(p >= 0) and np.all(p <= np.array(volume.shape) - 1): #if in te interval
+                # Round to the nearest voxel; .5 always goes up (p >= 0 here).
+                voxel_index = np.floor(p + 0.5).astype(int)
                 value = volume[tuple(voxel_index)]
 
             # Convert the output coordinate to an integer index for NumPy.
