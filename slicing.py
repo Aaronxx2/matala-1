@@ -92,6 +92,8 @@ def extract_triangle_slice(volume, a, b, c):
 
 def extract_slice(volume, a1, a2, b, c):
     # Returns the 2D image extracted from the volume, with the professor's algorithm.
+    # Same steps as the loop version (tests/slow_slicing.py), but NumPy computes
+    # all the rows and all the pixels at once instead of one pixel at a time.
     a1, a2, b, c, dab, dbc = check_shape(a1, a2, b, c)
 
     v_ab = (b - a1) / dab
@@ -101,35 +103,49 @@ def extract_slice(volume, a1, a2, b, c):
     # Same type as the volume, so 16 and 32 bit values are kept as they are.
     E = np.zeros((height, width), dtype=volume.dtype)
 
-    # a1 and a2 start at the given points (both at a for a triangle).
-    start1 = a1
-    start2 = a2
+    # One step per row, from the start points (no drift).
+    # The last step is shorter: height = ceil(dab), so y + 1 can go past b and c,
+    # then the row would be wider than the base and x would be out of the image.
+    steps = np.minimum(np.arange(1, height + 1), dab)  # y + 1 for row y
+    row_a1 = a1 + steps[:, None] * v_ab  # where each row starts, shape (height, 3)
+    row_a2 = a2 + steps[:, None] * v_ac  # where each row ends
 
-    for y in range(height):
-        # Step from the start points instead of adding v_ab again and again (no drift).
-        # The last step is shorter: height = ceil(dab), so y + 1 can go past b and c,
-        # then the row would be wider than the base and x would be out of the image.
-        step = min(y + 1, dab)
-        a1 = start1 + step * v_ab
-        a2 = start2 + step * v_ac
+    d12 = length(row_a2 - row_a1)  # length of each row
+    # A row is never wider than the base, but rounding can give 48.00000000000001
+    # instead of 48, then x can round up to the width and be out of the image.
+    d12 = np.minimum(d12, dbc)
+    dp = (row_a2 - row_a1) / d12[:, None]  # step of 1 along each row
 
-        d12 = length(a2 - a1)  # distance between the progressing a1 and a2
-        # A row is never wider than the base, but rounding can give 48.00000000000001
-        # instead of 48, then x can round up to the width and be out of the image.
-        d12 = min(d12, dbc)
-        dp = (a2 - a1) / d12  # vector from a1 to a2 normalised
+    # x1 = 0, 1, 2 ... for every row; row y only uses x1 <= floor(d12[y]).
+    x1 = np.arange(width)
+    read = x1[None, :] <= np.floor(d12 + TINY)[:, None]  # shape (height, width)
 
-        for x1 in range(int(np.floor(d12 + TINY)) + 1):
-            p = a1 + x1 * dp  # from a1 each time (no drift)
-            value = 0
-            # Use the nearest voxel; volume axes are assumed to be (x, y, z).
-            if np.all(p >= 0) and np.all(p <= np.array(volume.shape) - 1):  # inside the volume
-                # Round to the nearest voxel; .5 always goes up (p >= 0 here).
-                voxel_index = np.floor(p + 0.5).astype(int)
-                value = volume[tuple(voxel_index)]
+    # Point p = a1 + x1 * dp of every (row, x1), one coordinate at a time.
+    # Only the points inside the volume are read, the others stay 0 (black).
+    upper = np.array(volume.shape) - 1
+    p = []
+    for k in range(3):
+        pk = row_a1[:, k, None] + x1[None, :] * dp[:, k, None]  # shape (height, width)
+        read &= (pk >= 0) & (pk <= upper[k])
+        p.append(pk)
 
-            # Convert the output coordinate to an integer index for NumPy.
-            x = int((dbc / 2) - (d12 / 2) + x1)
-            E[y, x] = value
+    # Round to the nearest voxel; .5 always goes up.
+    # p >= 0 here, so cutting the decimals of p + 0.5 is the same as floor(p + 0.5).
+    ix = (p[0][read] + 0.5).astype(np.intp)
+    iy = (p[1][read] + 0.5).astype(np.intp)
+    iz = (p[2][read] + 0.5).astype(np.intp)
+
+    sx, sy, sz = volume.shape
+    if volume.flags.f_contiguous:
+        # The NRRD volume is stored with x first (index_order="F"): reading with one
+        # number per voxel, x + sx * (y + sy * z), is about 2x faster than volume[ix, iy, iz].
+        values = volume.ravel(order="F")[ix + sx * (iy + sy * iz)]
+    else:
+        values = volume[ix, iy, iz]
+
+    # Column of each point: the row is centered in the image.
+    x = (((dbc / 2) - (d12 / 2))[:, None] + x1[None, :]).astype(np.intp)
+    y = np.broadcast_to(np.arange(height)[:, None], x.shape)
+    E[y[read], x[read]] = values
 
     return E
