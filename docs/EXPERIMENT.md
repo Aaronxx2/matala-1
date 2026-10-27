@@ -10,7 +10,7 @@ python benchmark.py
 
 Computers:
 
-- **My PC**: Windows, Python 3.11.9.
+- **My PC**: Intel Core Ultra 9 285H (16 cores), Windows, Python 3.11.9.
 - **A cloud machine**: Intel Xeon 2.8 GHz, 2 cores, Linux, Python 3.13, NumPy 2.5.
 
 The numbers change by about 10% from one run to the next; for the cloud machine the tables give the range of 2 or 3 runs.
