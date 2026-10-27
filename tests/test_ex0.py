@@ -38,6 +38,11 @@ def test_nrrd_types_are_read_with_x_first(tmp_path, dtype):
     assert loaded[1, 2, 3] == np.iinfo(dtype).max
 
 
+def test_missing_file_gives_an_error(tmp_path):
+    with pytest.raises(OSError):
+        Ex0.main([str(tmp_path / "missing.nrrd"), str(tmp_path / "planes.csv"), str(tmp_path / "out.mp4")])
+
+
 def test_one_frame_per_row(tmp_path):
     rows = ["3,8,2,8,2,13,8,14,13,8,,,", "4,2,2,8,2,13,8,13,2,8,13,13,8", "3,8,2,8,2,13,8,14,13,8,,,"]
     volume, nrrd_path, csv_path = write_files(tmp_path, rows)

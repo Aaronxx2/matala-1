@@ -138,7 +138,7 @@ def extract_slice(volume, a1, a2, b, c):
     sx, sy, sz = volume.shape
     if volume.flags.f_contiguous:
         # The NRRD volume is stored with x first (index_order="F"): reading with one
-        # number per voxel, x + sx * (y + sy * z), is about 2x faster than volume[ix, iy, iz].
+        # number per voxel, x + sx * (y + sy * z), is almost 2x faster than volume[ix, iy, iz].
         values = volume.ravel(order="F")[ix + sx * (iy + sy * iz)]
     else:
         values = volume[ix, iy, iz]

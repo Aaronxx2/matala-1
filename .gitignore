@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 *.nrrd
 slice.png
+.pytest_cache/
+*.tmp.mp4
