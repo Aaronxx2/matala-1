@@ -1,3 +1,23 @@
+# Makes CSV files of planes (triangles and trapezoids) for Ex0.py.
+# It does not cut anything: it only writes the list of shapes that Ex0.py will cut.
+# The professor suggested a generator like this in class, because writing 100 rows
+# by hand, with equal sides every time, is long and easy to get wrong.
+#
+# It reads only the header of the NRRD file to know the size of the volume, then:
+#   --mode rotate (default): squares turning around the center of the volume,
+#                            big enough to cover it at every angle (planes_100.csv)
+#   --mode random:           random triangles and trapezoids in all directions,
+#                            often with points outside the volume (random_100.csv)
+# Every shape is valid by construction: the two sides are symmetric, so they have
+# the same length. The same --seed always gives the same CSV.
+#
+# Examples:
+#   python make_planes.py MRHead_1.nrrd planes.csv
+#   python make_planes.py MRHead_1.nrrd planes.csv --count 300 --axis 0
+#   python make_planes.py MRHead_1.nrrd planes.csv --mode random --seed 4
+#
+# Also used by the tests and by benchmark.py to get many different planes.
+
 import argparse
 import csv
 from pathlib import Path

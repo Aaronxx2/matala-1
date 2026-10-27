@@ -67,4 +67,4 @@ Coordinates are voxel indices (not millimeters). With 3 points the order is `a, 
 
 ## Use of AI
 
-As allowed by the course, I used an AI assistant (Claude, by Anthropic). The first version of `slicing.py` and `main.py` is mine, written from the professor's pseudo-code. Claude helped me find bugs, add the trapezoid, the video output, the plane generator, the tests, the fast NumPy version and these documents.
+I used claude code during the development of the project
