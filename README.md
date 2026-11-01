@@ -53,7 +53,6 @@ Coordinates are voxel indices (not millimeters). With 3 points the order is `a, 
 | `slicing.py` | the checks and the cut (the algorithm) |
 | `make_planes.py` | makes CSV files of planes for a volume |
 | `benchmark.py` | measures the cuts per second |
-| `main.py` | first version of the demo: saves the cut of the first CSV row as a PNG |
 | `tests/` | the tests, and `slow_slicing.py`, the first loop version kept as a reference |
 | `demo/` | the videos of the experiment |
 

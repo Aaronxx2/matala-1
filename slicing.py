@@ -99,10 +99,6 @@ def four_points(points):
     return points
 
 
-def extract_triangle_slice(volume, a, b, c):
-    return extract_slice(volume, *four_points([a, b, c]))
-
-
 def extract_slice(volume, a1, a2, b, c):
     # Returns the 2D image extracted from the volume, with the professor's algorithm.
     # Same steps as the loop version (tests/slow_slicing.py), but NumPy computes
