@@ -104,7 +104,7 @@ def random_planes(shape, count, seed):
     return planes
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description="Write a CSV of planes for a volume (turning around the center, or random).")
     parser.add_argument("nrrd_file", type=Path)
     parser.add_argument("csv_file", type=Path)
@@ -114,7 +114,7 @@ def main():
     parser.add_argument("--mode", choices=["rotate", "random"], default="rotate",
                         help="rotate: planes turning around the center, random: random triangles and trapezoids")
     parser.add_argument("--seed", type=int, default=0, help="random seed for --mode random (default 0)")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     # Only the header is needed to know the size of the volume.
     header = nrrd.read_header(str(args.nrrd_file))

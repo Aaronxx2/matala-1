@@ -66,6 +66,7 @@ Bugs found by the tests in the real code:
 | `test_coordinates.py::test_outside_volume_is_black` | square with y from −10 to 10 | columns 0–9 black, 10–20 read | FR-5 |
 | `test_coordinates.py::test_plane_completely_outside_is_all_black` | square far away | all black | FR-5 |
 | `test_coordinates.py::test_values_keep_their_type` | 8, 16, 32-bit volume with the maximum value | same type, same maximum | FR-7 |
+| `test_coordinates.py::test_triangle_is_the_trapezoid_with_a1_equal_a2` | 3 points, then 4 points | (a, b, c) becomes (a, a, b, c), 4 points stay the same | FR-3 |
 | `test_fast_matches_slow.py` (3 tests) | 110 random and 36 turning planes, 2 memory orders | exactly the same images | FR-4, NFR-1 |
 | `test_bad_input.py::test_bad_shapes_are_rejected` | 9 bad shapes: coincident points, `b = c`, flat triangle, unequal sides, small base too big, bent trapezoid, nan, inf | error with the reason | FR-2, FR-3, ER-3 |
 | `test_bad_input.py::test_almost_isosceles_is_accepted` | sides differ by 0.0005 | accepted | FR-2 |
@@ -80,6 +81,7 @@ Bugs found by the tests in the real code:
 | `test_ex0.py::test_one_frame_per_row` | CSV of 3 rows | MP4 with 3 frames | FR-8 |
 | `test_ex0.py::test_bad_row_leaves_no_video` | row 3 not isosceles | error "CSV row 3", no MP4 file | ER-3, ER-4 |
 | `test_ex0.py::test_bad_row_keeps_an_old_video` | bad row, old `out.mp4` | old file not changed | ER-4 |
+| `test_make_planes.py::test_written_csv_is_read_back_by_ex0` | 12 turning planes, 12 random planes | `Ex0.py` reads 12 rows back and every shape is valid | FR-2, FR-3 |
 
 ## Not tested automatically
 
