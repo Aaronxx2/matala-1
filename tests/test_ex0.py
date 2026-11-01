@@ -71,3 +71,21 @@ def test_bad_row_keeps_an_old_video(tmp_path):
     with pytest.raises(ValueError):
         Ex0.main([str(nrrd_path), str(csv_path), str(mp4_path)])
     assert mp4_path.read_bytes() == b"old video"
+
+
+def test_same_value_same_gray_in_every_frame():
+    # The gray scale comes from the volume, not from each image (FR-9):
+    # 100 is the same gray in an image with values up to 200 and in one with only 100.
+    bright = Ex0.to_frame(np.array([[100, 200]], dtype=np.uint16), 0, 200, 16, 16)
+    dark = Ex0.to_frame(np.array([[100, 100]], dtype=np.uint16), 0, 200, 16, 16)
+    assert bright.dtype == np.uint8
+    assert bright[7, 7] == dark[7, 7] == 127  # 100 / 200 * 255
+    assert bright[7, 8] == 255
+
+
+def test_small_image_is_in_the_middle_of_a_black_frame():
+    # Every frame has the same size, the image is centered on black (FR-10).
+    frame = Ex0.to_frame(np.full((2, 4), 50, dtype=np.uint8), 0, 50, 16, 16)
+    assert frame.shape == (16, 16)
+    assert np.all(frame[7:9, 6:10] == 255)
+    assert np.count_nonzero(frame) == 8

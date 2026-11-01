@@ -81,9 +81,11 @@ Bugs found by the tests in the real code:
 | `test_ex0.py::test_one_frame_per_row` | CSV of 3 rows | MP4 with 3 frames | FR-8 |
 | `test_ex0.py::test_bad_row_leaves_no_video` | row 3 not isosceles | error "CSV row 3", no MP4 file | ER-3, ER-4 |
 | `test_ex0.py::test_bad_row_keeps_an_old_video` | bad row, old `out.mp4` | old file not changed | ER-4 |
+| `test_ex0.py::test_same_value_same_gray_in_every_frame` | value 100 in two images with different maximums | same gray 127 in both | FR-9 |
+| `test_ex0.py::test_small_image_is_in_the_middle_of_a_black_frame` | 2 × 4 image, 16 × 16 frame | image in the middle, the rest black | FR-10 |
 | `test_make_planes.py::test_written_csv_is_read_back_by_ex0` | 12 turning planes, 12 random planes | `Ex0.py` reads 12 rows back and every shape is valid | FR-2, FR-3 |
 
 ## Not tested automatically
 
-- The gray scale and the frame size of the video (FR-9, FR-10): checked by watching the videos in `demo/`.
+- The video itself after MP4 compression (FR-9, FR-10): checked by watching the videos in `demo/`. The frames before compression are tested.
 - The speed (NFR-1): measured with `benchmark.py` and `Ex0.py`, see [EXPERIMENT.md](EXPERIMENT.md). A speed test in pytest would depend on the computer.

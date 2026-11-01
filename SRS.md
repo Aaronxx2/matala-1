@@ -88,7 +88,7 @@ Alternative 2a: a file is missing or a row is wrong. The system prints the error
 | FR-6 | `test_coordinates.py::test_rounding_half_goes_up` |
 | FR-7 | `test_coordinates.py::test_values_keep_their_type` |
 | FR-8 | `test_ex0.py::test_one_frame_per_row`, `test_bad_input.py::test_rows_keep_their_order` |
-| FR-9, FR-10 | not tested automatically: checked by watching the videos |
+| FR-9, FR-10 | `test_ex0.py::test_same_value_same_gray_in_every_frame`, `test_small_image_is_in_the_middle_of_a_black_frame`, and by watching the videos |
 | ER-1 | `test_ex0.py::test_missing_file_gives_an_error` |
 | ER-2 | `test_bad_input.py::test_bad_rows_give_the_row_number`, `test_nan_and_inf_are_rejected`, `test_empty_csv` |
 | ER-4 | `test_ex0.py::test_bad_row_leaves_no_video`, `test_bad_row_keeps_an_old_video` |

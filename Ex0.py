@@ -46,6 +46,28 @@ def read_planes(csv_path):
     return planes
 
 
+def check_planes(planes):
+    # Checks every plane and returns the (height, width) of each image, in the CSV order.
+    sizes = []
+    for row_number, points in planes:
+        try:
+            a1, a2, b, c, dab, dbc = check_shape(*four_points(points))
+        except ValueError as error:
+            raise ValueError(f"CSV row {row_number}: {error}")
+        sizes.append(image_size(dab, dbc))
+    return sizes
+
+
+def to_frame(image, low, high, frame_height, frame_width):
+    # Gray scale from low (black) to high (white), image in the middle of a black frame.
+    pixels = np.clip((image - low) / (high - low) * 255, 0, 255).astype(np.uint8)
+    frame = np.zeros((frame_height, frame_width), dtype=np.uint8)
+    top = (frame_height - pixels.shape[0]) // 2
+    left = (frame_width - pixels.shape[1]) // 2
+    frame[top:top + pixels.shape[0], left:left + pixels.shape[1]] = pixels
+    return frame
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Cut a 3D volume along each plane of a CSV file and save the cuts as a video.")
     parser.add_argument("nrrd_file", type=Path)
@@ -59,13 +81,7 @@ def main(argv=None):
     planes = read_planes(args.csv_file)
 
     # Check every plane before writing anything, and get the size of each image.
-    sizes = []
-    for row_number, points in planes:
-        try:
-            a1, a2, b, c, dab, dbc = check_shape(*four_points(points))
-        except ValueError as error:
-            raise ValueError(f"CSV row {row_number}: {error}")
-        sizes.append(image_size(dab, dbc))
+    sizes = check_planes(planes)
 
     # Same gray scale for every frame: 0 is black and the max of the volume is white.
     # So the same value always has the same brightness in the whole video.
@@ -90,12 +106,7 @@ def main(argv=None):
                 image = extract_slice(volume, *four_points(points))
                 cut_time += time.perf_counter() - start
 
-                pixels = np.clip((image - low) / (high - low) * 255, 0, 255).astype(np.uint8)
-                frame = np.zeros((frame_height, frame_width), dtype=np.uint8)
-                top = (frame_height - pixels.shape[0]) // 2
-                left = (frame_width - pixels.shape[1]) // 2
-                frame[top:top + pixels.shape[0], left:left + pixels.shape[1]] = pixels
-                video.append_data(frame)
+                video.append_data(to_frame(image, low, high, frame_height, frame_width))
         os.replace(temp_file, args.mp4_file)
     except BaseException:
         if temp_file.exists():
