@@ -25,8 +25,7 @@ def check_shape(a1, a2, b, c):
     b = np.array(b, dtype=float)
     c = np.array(c, dtype=float)
 
-    if not (np.all(np.isfinite(a1)) and np.all(np.isfinite(a2))
-            and np.all(np.isfinite(b)) and np.all(np.isfinite(c))):
+    if not np.all(np.isfinite([a1, a2, b, c])):
         raise ValueError("A point has a coordinate that is nan or inf.")
 
     dab = length(b - a1)  # Length of the side a1 -> b.
@@ -48,32 +47,40 @@ def check_shape(a1, a2, b, c):
             f"(difference must be < {EPS})."
         )
 
-    if d_small < EPS:  # triangle
-        # a, b, c on one line (for example b and c on both sides of a) pass the
-        # checks above but are not a triangle: c must be away from the line a -> b.
-        dist_c_line = length(np.cross(b - a1, c - a1)) / dab
-        if dist_c_line < EPS:
-            raise ValueError("Degenerate triangle: a, b and c are on the same line.")
-    else:  # trapezoid
-        # The small base can't be bigger than the big base.
-        if d_small > dbc + EPS:
-            raise ValueError(
-                f"Small base is bigger than big base: dist(a1,a2) = {d_small:.4f} "
-                f"but dist(b,c) = {dbc:.4f}."
-            )
-        # The 4 points must be on the same plane.
-        # normal is perpendicular to the plane of a1, a2, b.
-        normal = np.cross(a2 - a1, b - a1)
-        if length(normal) < EPS:
-            raise ValueError("Degenerate trapezoid: a1, a2 and b are on the same line.")
-        # distance from c to that plane, must be about 0
-        dist_c_plane = abs(np.dot(normal, c - a1)) / length(normal)
-        if dist_c_plane >= EPS:
-            raise ValueError(
-                f"The 4 points are not on the same plane: c is {dist_c_plane:.4f} away from it."
-            )
+    if d_small < EPS:
+        check_triangle(a1, b, c, dab)
+    else:
+        check_trapezoid(a1, a2, b, c, d_small, dbc)
 
     return a1, a2, b, c, dab, dbc
+
+
+def check_triangle(a, b, c, dab):
+    # a, b, c on one line (for example b and c on both sides of a) pass the
+    # checks of check_shape but are not a triangle: c must be away from the line a -> b.
+    dist_c_line = length(np.cross(b - a, c - a)) / dab
+    if dist_c_line < EPS:
+        raise ValueError("Degenerate triangle: a, b and c are on the same line.")
+
+
+def check_trapezoid(a1, a2, b, c, d_small, dbc):
+    # The small base can't be bigger than the big base.
+    if d_small > dbc + EPS:
+        raise ValueError(
+            f"Small base is bigger than big base: dist(a1,a2) = {d_small:.4f} "
+            f"but dist(b,c) = {dbc:.4f}."
+        )
+    # The 4 points must be on the same plane.
+    # normal is perpendicular to the plane of a1, a2, b.
+    normal = np.cross(a2 - a1, b - a1)
+    if length(normal) < EPS:
+        raise ValueError("Degenerate trapezoid: a1, a2 and b are on the same line.")
+    # distance from c to that plane, must be about 0
+    dist_c_plane = abs(np.dot(normal, c - a1)) / length(normal)
+    if dist_c_plane >= EPS:
+        raise ValueError(
+            f"The 4 points are not on the same plane: c is {dist_c_plane:.4f} away from it."
+        )
 
 
 def image_size(dab, dbc):
