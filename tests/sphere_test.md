@@ -63,7 +63,7 @@ A disk in a triangle image looks a little oval, and has `π · r² · stretch` w
 
 The sphere test checks the shape of the cut, not the exact place of every pixel. For example, if the direction `a2 → c` is wrong by 3%, all the cases still pass.
 
-To check every pixel, we need another test: a volume where each voxel holds its own coordinate (for example `M[x][y][z] = z`). Then a cut at z = 40 must give exactly 40 in every pixel of the shape.
+That is why `test_coordinates.py` uses a volume where each voxel holds its own coordinates, so every pixel can be checked.
 
 ## Bug found by this test
 
