@@ -44,7 +44,7 @@ def test_missing_file_gives_an_error(tmp_path):
 
 
 def test_one_frame_per_row(tmp_path):
-    rows = ["3,8,2,8,2,13,8,14,13,8,,,", "4,2,2,8,2,13,8,13,2,8,13,13,8", "3,8,2,8,2,13,8,14,13,8,,,"]
+    rows = ["3,8,2,8,2,13,8,14,13,8,,,", "4,2,2,8,13,2,8,2,13,8,13,13,8", "3,8,2,8,2,13,8,14,13,8,,,"]
     volume, nrrd_path, csv_path = write_files(tmp_path, rows)
     mp4_path = tmp_path / "out.mp4"
     Ex0.main([str(nrrd_path), str(csv_path), str(mp4_path)])

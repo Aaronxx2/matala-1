@@ -13,7 +13,7 @@ import numpy as np
 import pytest
 
 from make_planes import random_planes, rotating_planes
-from slicing import extract_slice, four_points
+from slicing import check_shape, extract_slice, four_points
 
 N = 40  # the volume is N x N x N
 MARGIN = np.sqrt(3) / 2  # max distance between a point and the center of its rounded voxel
@@ -155,7 +155,7 @@ def test_values_keep_their_type(dtype):
 def test_rotating_planes_stay_on_their_plane():
     # Same check as above with the planes of the demo video.
     for points in rotating_planes(VOLUME.shape, 12, 1):
-        a1, a2, b, c = [np.array(p) for p in points]
+        a1, a2, b, c = [np.array(p) for p in four_points(points)]
         image = extract_slice(VOLUME, a1, a2, b, c)
         normal = np.cross(a2 - a1, b - a1)
         normal = normal / np.linalg.norm(normal)
@@ -164,8 +164,18 @@ def test_rotating_planes_stay_on_their_plane():
         assert np.all(np.abs(q @ normal) <= MARGIN + 1e-9)
 
 
-def test_triangle_is_the_trapezoid_with_a1_equal_a2():
-    # A triangle (a, b, c) is cut like the trapezoid (a, a, b, c); 4 points stay as they are.
+def test_csv_points_are_put_in_the_order_of_extract_slice():
+    # A triangle (a, b, c) is cut like the trapezoid (a, a, b, c).
+    # A trapezoid is given side by side in the CSV, (a1, b, a2, c), and cut as (a1, a2, b, c).
     a, b, c = [5, 20, 20], [30, 5, 20], [30, 35, 20]
     assert four_points([a, b, c]) == [a, a, b, c]
-    assert four_points([a, a, b, c]) == [a, a, b, c]
+    a1, a2 = [5, 15, 20], [5, 25, 20]
+    assert four_points([a1, b, a2, c]) == [a1, a2, b, c]
+
+
+def test_professor_trapezoid_is_valid_side_by_side():
+    # Row 5 of the professor's example: sides of 300 and 400 when read as (a1, a2, b, c),
+    # but an isosceles trapezoid (sides of 502.5) when read side by side as (a1, b, a2, c).
+    points = [[200, 50, 0], [200, 0, 500], [200, 350, 0], [200, 400, 500]]
+    a1, a2, b, c, dab, dbc = check_shape(*four_points(points))
+    assert abs(dab - np.sqrt(50 ** 2 + 500 ** 2)) < 1e-9

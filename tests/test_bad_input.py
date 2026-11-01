@@ -94,7 +94,7 @@ def test_empty_csv(tmp_path):
 
 
 def test_rows_keep_their_order(tmp_path):
-    path = write_csv(tmp_path, ["3,0,0,0,10,0,0,0,10,0,,,", "4,0,0,0,0,10,0,10,0,0,10,10,0",
+    path = write_csv(tmp_path, ["3,0,0,0,10,0,0,0,10,0,,,", "4,0,0,0,10,0,0,0,10,0,10,10,0",
                                 "3,1,1,1,11,1,1,1,11,1,,,"])
     planes = read_planes(path)
     assert [row for row, points in planes] == [2, 3, 4]

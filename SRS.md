@@ -26,7 +26,7 @@ References: the exercise text (Ex1, Intro2SE), the lectures of 21 and 25 October
 1. **NRRD file**: a 3D volume of unsigned integers (8, 16 or 32 bits). Each dimension is between 1 and 1023.
 2. **CSV file**: one plane per row, with this header:
    `Number of Points (3 or 4),x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4`
-   For a triangle the last three cells are empty.
+   A triangle is `a, b, c` and the last three cells are empty. A trapezoid is `a1, b, a2, c`: the side `a1 -> b`, then the side `a2 -> c`.
 3. **Output path** of the MP4 file.
 
 Coordinates are voxel indices, not millimeters. Points may be outside the volume.

@@ -29,6 +29,7 @@ def test_random_planes(seed):
 def test_rotating_planes(axis):
     volume = coordinate_volume((40, 50, 30))
     for points in rotating_planes(volume.shape, 12, axis):
+        points = four_points(points)
         assert np.array_equal(extract_slice(volume, *points), slow_extract_slice(volume, *points))
 
 

@@ -92,11 +92,14 @@ def image_size(dab, dbc):
 
 
 def four_points(points):
+    # Puts the points of a CSV row in the order of extract_slice: (a1, a2, b, c).
     # A triangle is a trapezoid where the small base is only one point,
-    # so (a, b, c) becomes (a1, a2, b, c) = (a, a, b, c). 4 points stay as they are.
+    # so (a, b, c) becomes (a, a, b, c).
+    # A trapezoid is given side by side, like the professor's example: (a1, b, a2, c),
+    # the side a1 -> b first, then the side a2 -> c.
     if len(points) == 3:
         return [points[0], points[0], points[1], points[2]]
-    return points
+    return [points[0], points[2], points[1], points[3]]
 
 
 def extract_slice(volume, a1, a2, b, c):

@@ -30,7 +30,7 @@ What we see:
 - The anatomy is in the right place and continuous from one frame to the next in the turning video, so the planes are followed in the CSV order.
 - The images are rather dark: the gray scale goes up to the brightest voxel of the volume (279), while almost all voxels are under 153. This keeps the same gray for the same value in every frame (see DESIGN.md, section 7).
 - The triangles of `random_100.mp4` look a little stretched vertically. This is the algorithm: each row moves by 1 along the side, not straight down (DESIGN.md, section 5).
-- `professor_example.csv` stops at row 4: rows 4 and 5 are not valid shapes (DATASET.md).
+- `professor_example.csv` stops at row 4: this triangle does not have two equal sides (DATASET.md).
 
 ## Speed
 

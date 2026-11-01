@@ -32,7 +32,7 @@ HEADER = ["Number of Points (3 or 4)", "x1", "y1", "z1", "x2", "y2", "z2",
 def rotating_planes(shape, count, axis):
     # Makes `count` rectangles (trapezoids with equal bases) that turn around
     # the center of the volume, around the given axis, like a page of a book.
-    # Returns a list of 4 points (a1, a2, b, c) for each plane.
+    # Returns a list of 4 points in the CSV order (a1, b, a2, c) for each plane.
     shape = np.array(shape, dtype=float)
     center = (shape - 1) / 2  # voxel indices go from 0 to size - 1
 
@@ -61,7 +61,7 @@ def rotating_planes(shape, count, axis):
         a2 = center - half_height * w + half_width * u
         b = center + half_height * w - half_width * u
         c = center + half_height * w + half_width * u
-        planes.append([a1, a2, b, c])
+        planes.append([a1, b, a2, c])
     return planes
 
 
@@ -100,7 +100,7 @@ def random_planes(shape, count, seed):
             half_small = rng.uniform(0.1, 0.9) * half_base
             a1 = a - half_small * e
             a2 = a + half_small * e
-            planes.append([a1, a2, b, c])
+            planes.append([a1, b, a2, c])  # CSV order: side a1 -> b, then side a2 -> c
     return planes
 
 

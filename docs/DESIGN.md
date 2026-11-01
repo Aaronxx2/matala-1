@@ -34,6 +34,7 @@ In MRHead a voxel is 1 × 1 × 1.3 mm. The algorithm works on indices, so a cut 
 ```
 
 - A triangle `(a, b, c)` is handled as the trapezoid `(a, a, b, c)`. One code for both.
+- In the CSV a trapezoid is written side by side, `a1, b, a2, c`, like the professor's example (with the order `a1, a2, b, c` its row 5 would have sides of 300 and 400 instead of 502.5 and 502.5). `four_points` in `slicing.py` puts the points in the order `a1, a2, b, c` used by the cut.
 - The sides `a1 -> b` and `a2 -> c` have the same length `dab`. The big base `b c` has length `dbc`.
 
 ## 4. The cut, step by step

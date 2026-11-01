@@ -40,10 +40,10 @@ One plane per row, the same header as the professor's example:
 ```
 Number of Points (3 or 4),x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4
 3,128,40,40,53,140,40,203,100,120,,,
-4,100,60,30,156,60,30,70,180,90,186,180,90
+4,100,60,30,70,180,90,156,60,30,186,180,90
 ```
 
-Coordinates are voxel indices (not millimeters). With 3 points the order is `a, b, c` with `dist(a,b) = dist(a,c)`. With 4 points it is `a1, a2, b, c`: the small base `a1 a2`, the big base `b c`, and the sides `a1 -> b` and `a2 -> c`.
+Coordinates are voxel indices (not millimeters). With 3 points the order is `a, b, c` with `dist(a,b) = dist(a,c)`. With 4 points it is `a1, b, a2, c`, one side after the other: the side `a1 -> b`, then the side `a2 -> c`, with `dist(a1,b) = dist(a2,c)`. The small base is `a1 a2` and the big base is `b c`. This is the order of the professor's example: with it, its trapezoids are isosceles.
 
 ## Files
 
@@ -66,7 +66,7 @@ Coordinates are voxel indices (not millimeters). With 3 points the order is `a, 
 
 ## Testing
 
-`python -m pytest` runs the 112 tests in a few seconds. They build their own volumes, so they do not need `MRHead_1.nrrd`.
+`python -m pytest` runs the 113 tests in a few seconds. They build their own volumes, so they do not need `MRHead_1.nrrd`.
 
 The tests use volumes where the right answer is known in advance:
 

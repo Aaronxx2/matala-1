@@ -42,11 +42,8 @@ The tests build their own small volumes, in memory or as real NRRD files in a te
 
 ### The professor's example
 
-It shows the format, and its points are made for a bigger volume (about 500³), so on MRHead most of each cut is black. Rows 4 and 5 of the file break the exercise's own rules:
+It shows the format, and its points are made for a bigger volume (about 500³), so on MRHead most of each cut is black.
 
-| Row | Shape | Problem |
-|---|---|---|
-| 4 | triangle | `dist(a,b) = 497.39` but `dist(a,c) = 476.86` |
-| 5 | trapezoid | `dist(a1,b) = 300` but `dist(a2,c) = 400` |
+Its trapezoids tell the order of the 4 points: read side by side, `a1, b, a2, c`, row 5 has two sides of 502.5 (an isosceles trapezoid with bases of 300 and 400). Read as `a1, a2, b, c`, the same row would have sides of 300 and 400. So the program uses `a1, b, a2, c`.
 
-So `Ex0.py` stops at row 4. This is a question for the professor.
+Row 4 breaks the exercise's own rules: it is a triangle with `dist(a,b) = 497.39` but `dist(a,c) = 476.86`. So `Ex0.py` stops at row 4. This is a question for the professor.

@@ -22,7 +22,7 @@ def load_volume(nrrd_path):
 
 def read_planes(csv_path):
     # Returns a list of (row_number, points), one item per CSV row, in the CSV order.
-    # 3 points = triangle (a, b, c), 4 points = trapezoid (a1, a2, b, c).
+    # 3 points = triangle (a, b, c), 4 points = trapezoid (a1, b, a2, c).
     planes = []
     with csv_path.open(newline="", encoding="utf-8-sig") as csv_file:
         reader = csv.DictReader(csv_file)

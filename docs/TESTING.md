@@ -66,7 +66,8 @@ Bugs found by the tests in the real code:
 | `test_coordinates.py::test_outside_volume_is_black` | square with y from −10 to 10 | columns 0–9 black, 10–20 read | FR-5 |
 | `test_coordinates.py::test_plane_completely_outside_is_all_black` | square far away | all black | FR-5 |
 | `test_coordinates.py::test_values_keep_their_type` | 8, 16, 32-bit volume with the maximum value | same type, same maximum | FR-7 |
-| `test_coordinates.py::test_triangle_is_the_trapezoid_with_a1_equal_a2` | 3 points, then 4 points | (a, b, c) becomes (a, a, b, c), 4 points stay the same | FR-3 |
+| `test_coordinates.py::test_csv_points_are_put_in_the_order_of_extract_slice` | 3 points, then 4 points | (a, b, c) becomes (a, a, b, c), (a1, b, a2, c) becomes (a1, a2, b, c) | FR-3 |
+| `test_coordinates.py::test_professor_trapezoid_is_valid_side_by_side` | row 5 of the professor's example | accepted (two sides of 502.5) | FR-3 |
 | `test_fast_matches_slow.py` (3 tests) | 110 random and 36 turning planes, 2 memory orders | exactly the same images | FR-4, NFR-1 |
 | `test_bad_input.py::test_bad_shapes_are_rejected` | 9 bad shapes: coincident points, `b = c`, flat triangle, unequal sides, small base too big, bent trapezoid, nan, inf | error with the reason | FR-2, FR-3, ER-3 |
 | `test_bad_input.py::test_almost_isosceles_is_accepted` | sides differ by 0.0005 | accepted | FR-2 |
