@@ -13,7 +13,7 @@ import numpy as np
 import pytest
 
 from make_planes import random_planes, rotating_planes
-from slicing import extract_slice
+from slicing import extract_slice, four_points
 
 N = 40  # the volume is N x N x N
 MARGIN = np.sqrt(3) / 2  # max distance between a point and the center of its rounded voxel
@@ -35,18 +35,11 @@ def decode(image, n=N):
 VOLUME = coordinate_volume()
 
 
-def as_four_points(points):
-    # A triangle (a, b, c) is the trapezoid (a, a, b, c).
-    if len(points) == 3:
-        return [points[0], points[0], points[1], points[2]]
-    return points
-
-
 @pytest.mark.parametrize("seed", range(6))
 def test_every_pixel_comes_from_the_right_place(seed):
     # Random triangles and trapezoids around the volume (some points outside).
     for points in random_planes(VOLUME.shape, 15, seed):
-        a1, a2, b, c = [np.array(p, dtype=float) for p in as_four_points(points)]
+        a1, a2, b, c = [np.array(p, dtype=float) for p in four_points(points)]
         image = extract_slice(VOLUME, a1, a2, b, c)
 
         dab = np.linalg.norm(b - a1)
@@ -169,3 +162,10 @@ def test_rotating_planes_stay_on_their_plane():
         x, y, z = decode(image[image > 0])
         q = np.stack([x, y, z], axis=1) - a1
         assert np.all(np.abs(q @ normal) <= MARGIN + 1e-9)
+
+
+def test_triangle_is_the_trapezoid_with_a1_equal_a2():
+    # A triangle (a, b, c) is cut like the trapezoid (a, a, b, c); 4 points stay as they are.
+    a, b, c = [5, 20, 20], [30, 5, 20], [30, 35, 20]
+    assert four_points([a, b, c]) == [a, a, b, c]
+    assert four_points([a, a, b, c]) == [a, a, b, c]

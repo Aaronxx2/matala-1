@@ -6,14 +6,8 @@ import numpy as np
 import pytest
 
 from make_planes import random_planes, rotating_planes
-from slicing import extract_slice
+from slicing import extract_slice, four_points
 from slow_slicing import slow_extract_slice
-
-
-def four_points(points):
-    if len(points) == 3:
-        return [points[0], points[0], points[1], points[2]]
-    return points
 
 
 def coordinate_volume(shape):

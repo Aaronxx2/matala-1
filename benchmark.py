@@ -5,13 +5,7 @@ import time
 import numpy as np
 
 from make_planes import random_planes, rotating_planes
-from slicing import extract_slice
-
-
-def four_points(points):
-    if len(points) == 3:
-        return [points[0], points[0], points[1], points[2]]
-    return points
+from slicing import extract_slice, four_points
 
 
 def measure(volume, planes):

@@ -9,7 +9,7 @@ import imageio.v2 as imageio
 import nrrd
 import numpy as np
 
-from slicing import check_shape, extract_slice, image_size
+from slicing import check_shape, extract_slice, four_points, image_size
 
 
 def load_volume(nrrd_path):
@@ -44,13 +44,6 @@ def read_planes(csv_path):
     if not planes:
         raise ValueError("The CSV file contains no planes.")
     return planes
-
-
-def four_points(points):
-    # The triangle (a, b, c) is the trapezoid (a, a, b, c).
-    if len(points) == 3:
-        return [points[0], points[0], points[1], points[2]]
-    return points
 
 
 def main(argv=None):

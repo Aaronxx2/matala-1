@@ -84,10 +84,16 @@ def image_size(dab, dbc):
     return height, width
 
 
-def extract_triangle_slice(volume, a, b, c):
+def four_points(points):
     # A triangle is a trapezoid where the small base is only one point,
-    # so a1 and a2 both start at a.
-    return extract_slice(volume, a, a, b, c)
+    # so (a, b, c) becomes (a1, a2, b, c) = (a, a, b, c). 4 points stay as they are.
+    if len(points) == 3:
+        return [points[0], points[0], points[1], points[2]]
+    return points
+
+
+def extract_triangle_slice(volume, a, b, c):
+    return extract_slice(volume, *four_points([a, b, c]))
 
 
 def extract_slice(volume, a1, a2, b, c):
